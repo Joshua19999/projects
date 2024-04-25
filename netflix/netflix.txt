@@ -1,0 +1,16 @@
+1.¿Cuántos valores nulos encontrás en los datos? ¿Los puedes eliminar?
+0,    con dropna(), (axis=1) columna, (axis=0) fila.
+2.¿Cuántos valores incompletos encontrás en los datos? ¿Los puedes reemplazar?
+0,      replace(diccionario)
+3.¿Podés eliminar columnas que no te aportan información? ¿Cuáles son? ¿Por qué las eliminarías?
+df = df.drop( 
+    df.iloc[:,0:2].columns,
+    axis=1
+)
+
+.drop([1,2], axis= 1)
+4.¿Qué tipo de dato es la columna “release_year”?¿Lo podes convertir a integer?
+dtype: int64,       .astype(float)
+5.La columna “listed_in” contiene diferentes valores separados por coma,
+ ¿Podés crear una columna y quedarte con el primer valor?
+.str.split(",", expand=True)
