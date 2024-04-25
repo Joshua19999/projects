@@ -1,0 +1,9 @@
+1.¿Qué organización lanzó más misiones espaciales en un año determinado?
+
+2.¿Cuántos lanzamientos se realizaron por año? 
+
+3.¿Cómo ha variado el costo de una misión espacial a lo largo del tiempo?
+
+4.¿Qué meses son los más populares para los lanzamientos? 
+
+5.¿Se han vuelto más seguras las misiones espaciales o las posibilidades de fracaso se han mantenido sin cambios?
