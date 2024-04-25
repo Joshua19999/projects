@@ -1,0 +1,9 @@
+1.¿Cuál es el precio promedio en Aires Acondicionados?
+₹58.2895931174089
+2.¿Qué categorías contienen los productos con precios más altos?
+appliances porque estoy usando un csv por falta de recursos pero se puede usar todos los csvs cambiando el principio de la extración de datos
+3.¿Existe una correlación entre precio y calificación en los productos?
+0.16885644338066325
+4.¿Cuál es el rango de precio dependiendo del tipo de subcategoría?
+Ejemplo: Air Conditioners	
+997.751
