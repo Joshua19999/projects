@@ -7,7 +7,7 @@ import tkinter as tk
 def tirar_dados():
     # Cierra la ventana principal al iniciar esta función
     root.destroy()
-
+ 
     def mostrar_resultado(event=None):
         try:
             # Obtiene el texto ingresado en la entrada y lo convierte a entero
