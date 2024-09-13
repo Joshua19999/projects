@@ -2,7 +2,17 @@ import tkinter as tk
 from tkinter import simpledialog, messagebox, filedialog
 
 class GeneradorInterfaz:
-    def __init__(self, root):
+    def __init__(self, ventana): 
+        self.ventana = ventana
+        ventana.title("Inicio")
+        ventana.geometry("300x400+400+100")
+
+        tk.Button(ventana, text="Nuevo", width=15, height=2, command=self.configurar_ventana).place(x=24, y=8)
+        tk.Button(ventana, text="Abrir", width=15, height=2).place(x=176, y=9)
+
+    def configurar_ventana(self):
+        self.ventana.destroy()
+        root=tk.Tk()
         self.root = root
         self.root.title("Generador de Interfaz Gráfica")
         self.seleccionado = None  # Para almacenar el widget seleccionado
@@ -45,7 +55,7 @@ class GeneradorInterfaz:
         # Botón para configurar los botones
         tk.Button(self.config_frame, text="Configurar Botones", command=self.configurar_botones).grid(row=7, column=0, columnspan=2, pady=10)
 
-        self.botones_frame = tk.Frame(root)
+        self.botones_frame = tk.Frame(self.root)
         self.botones_frame.pack(padx=10, pady=10, fill=tk.BOTH, expand=True)
 
     def configurar_botones(self):
@@ -232,6 +242,6 @@ class GeneradorInterfaz:
 
 # Crear la ventana principal
 if __name__ == "__main__":
-    root = tk.Tk()
-    app = GeneradorInterfaz(root)
-    root.mainloop()
+    ventana = tk.Tk()
+    app = GeneradorInterfaz(ventana)
+    ventana.mainloop()
