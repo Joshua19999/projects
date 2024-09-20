@@ -1,5 +1,7 @@
 import tkinter as tk
-from tkinter import simpledialog, messagebox, filedialog
+from tkinter import simpledialog, messagebox, filedialog, colorchooser
+import subprocess
+import sys
 
 class GeneradorInterfaz:
     def __init__(self, ventana): 
@@ -8,7 +10,7 @@ class GeneradorInterfaz:
         ventana.geometry("300x400+400+100")
 
         tk.Button(ventana, text="Nuevo", width=15, height=2, command=self.configurar_ventana).place(x=24, y=8)
-        tk.Button(ventana, text="Abrir", width=15, height=2).place(x=176, y=9)
+        tk.Button(ventana, text="Abrir", width=15, height=2,command=self.seleccionar_programa).place(x=176, y=9)
 
     def configurar_ventana(self):
         self.ventana.destroy()
@@ -128,6 +130,35 @@ class GeneradorInterfaz:
         # Abrir la ventana del editor
         self.abrir_ventana_editor()
 
+    def seleccionar_programa(self):
+        """Abre un cuadro de diálogo para seleccionar un archivo .py y habilita el botón de ejecutar."""
+        self.archivo_seleccionado = filedialog.askopenfilename(
+            title="Selecciona un script Python",
+            filetypes=(("Archivos Python", "*.py"), ("Todos los archivos", "*.*"))
+        )
+        
+        if self.archivo_seleccionado:
+            self.boton_ejecutar.config(state=tk.NORMAL)
+            messagebox.showinfo("Archivo seleccionado", f"Script seleccionado: {self.archivo_seleccionado}")
+        else:
+            messagebox.showwarning("Advertencia", "No has seleccionado ningún archivo.")
+
+    def ejecutar_programa(self):
+        """Ejecuta el script Python seleccionado."""
+        if self.archivo_seleccionado:
+            try:
+                # Ejecuta el archivo .py con el mismo intérprete de Python que está ejecutando este script
+                subprocess.run([sys.executable, self.archivo_seleccionado], check=True)
+                messagebox.showinfo("Éxito", "El script se ejecutó correctamente.")
+            except subprocess.CalledProcessError as e:
+                messagebox.showerror("Error", f"El script devolvió un error:\n{e}")
+            except FileNotFoundError:
+                messagebox.showerror("Error", "El archivo no se encontró.")
+            except Exception as e:
+                messagebox.showerror("Error", f"Hubo un problema al ejecutar el script:\n{e}")
+        else:
+            messagebox.showwarning("Advertencia", "No has seleccionado ningún archivo para ejecutar.")
+
     def crear_botones(self, ventana, botones):
         """ Crear los botones especificados en la ventana generada. """
         for texto, mensaje in botones:
@@ -140,7 +171,7 @@ class GeneradorInterfaz:
     def seleccionar_widget(self, event):
         """ Seleccionar un widget para posibles acciones como eliminar. """
         self.seleccionado = event.widget
-        print(f"Widget seleccionado: {self.seleccionado}")
+        
 
     def editar_texto_widget(self, event):
         """ Editar el texto de un widget con doble clic. """
@@ -186,6 +217,9 @@ class GeneradorInterfaz:
         tk.Button(editor, text="Insertar Botón", command=self.insertar_boton).pack(pady=10)
         tk.Button(editor, text="Insertar Texto", command=self.insertar_texto).pack(pady=10)
         tk.Button(editor, text="Eliminar Selección", command=self.eliminar_seleccion).pack(pady=10)
+              # Selector de colores
+        tk.Button(editor, text="Cambiar Color de Fondo", command=self.cambiar_color_fondo).pack(pady=10)
+        tk.Button(editor, text="Cambiar Color de Texto", command=self.cambiar_color_texto).pack(pady=10)
         tk.Button(editor, text="Generar Código", command=self.generar_codigo).pack(pady=10)
 
     def insertar_boton(self):
@@ -202,6 +236,8 @@ class GeneradorInterfaz:
         nuevo_texto.place(x=50, y=100)
         nuevo_texto.bind("<ButtonPress-1>", self.seleccionar_widget)
         nuevo_texto.bind("<Double-1>", self.editar_texto_widget)
+        nuevo_texto.bind("<B1-Motion>", self.on_drag)
+
 
     def eliminar_seleccion(self):
         """ Elimina el widget seleccionado de la ventana generada. """
@@ -212,13 +248,13 @@ class GeneradorInterfaz:
             messagebox.showerror("Error", "No hay selección para eliminar.")
 
     def generar_codigo(self):
-        """ Genera el código de la ventana y lo guarda en un archivo. """
+        """Genera el código de la ventana y lo guarda en un archivo, incluyendo texto, posición, tamaño y configuraciones de cada objeto (sin fuente)."""
         if not hasattr(self, 'nueva_ventana'):
             messagebox.showerror("Error", "No hay una ventana abierta para generar el código.")
             return
 
         widgets = self.nueva_ventana.winfo_children()
-        codigo = 'import tkinter as tk\n\n'
+        codigo = 'import tkinter as tk\nfrom tkinter import messagebox\n\n'
         codigo += f'def crear_ventana():\n'
         codigo += f'    ventana = tk.Tk()\n'
         codigo += f'    ventana.title("{self.nueva_ventana.title()}")\n'
@@ -226,19 +262,60 @@ class GeneradorInterfaz:
 
         for widget in widgets:
             if isinstance(widget, tk.Button):
-                codigo += f'    tk.Button(ventana, text="{widget.cget("text")}", width=15, height=2, command=lambda: tk.messagebox.showinfo("Mensaje", "{widget.cget("text")}")).place(x={widget.winfo_x()}, y={widget.winfo_y()})\n'
-            elif isinstance(widget, tk.Label):
-                codigo += f'    tk.Label(ventana, text="{widget.cget("text")}", font=("Arial", 14)).place(x={widget.winfo_x()}, y={widget.winfo_y()})\n'
+                # Obtener configuración del botón
+                texto_boton = widget.cget("text")
+                ancho_boton = widget.cget("width")
+                alto_boton = widget.cget("height")
+                color_fondo = widget.cget("bg")
+                color_texto = widget.cget("fg")
 
+                # Verificar si el botón tiene un comando asociado (mensaje)
+                if widget.cget("command"):
+                    codigo += (
+                        f'    tk.Button(ventana, text="{texto_boton}", width={ancho_boton}, height={alto_boton}, '
+                        f'bg="{color_fondo}", fg="{color_texto}", '
+                        f'command=lambda: messagebox.showinfo("Mensaje", "{texto_boton}")).place(x={widget.winfo_x()}, y={widget.winfo_y()})\n'
+                    )
+                else:
+                    codigo += (
+                        f'    tk.Button(ventana, text="{texto_boton}", width={ancho_boton}, height={alto_boton}, '
+                        f'bg="{color_fondo}", fg="{color_texto}").place(x={widget.winfo_x()}, y={widget.winfo_y()})\n'
+                    )
+
+            elif isinstance(widget, tk.Label):
+                # Obtener configuración de la etiqueta (sin fuente)
+                texto_etiqueta = widget.cget("text")
+                color_fondo = widget.cget("bg")
+                color_texto = widget.cget("fg")
+
+                codigo += (
+                    f'    tk.Label(ventana, text="{texto_etiqueta}", '
+                    f'bg="{color_fondo}", fg="{color_texto}").place(x={widget.winfo_x()}, y={widget.winfo_y()})\n'
+                )
+
+        # Cierre de la función
         codigo += '\n    ventana.mainloop()\n\n'
         codigo += 'if __name__ == "__main__":\n'
-        codigo += '    crear_ventana()'
+        codigo += '    crear_ventana()\n'
 
+        # Guardar el código en un archivo
         archivo = filedialog.asksaveasfilename(defaultextension=".py", filetypes=[("Python files", "*.py")])
         if archivo:
             with open(archivo, "w") as file:
                 file.write(codigo)
             messagebox.showinfo("Éxito", "Código generado y guardado exitosamente.")
+
+
+    def cambiar_color_fondo(self):
+        color = colorchooser.askcolor(title="Seleccionar color de fondo")
+        if color[1] and self.seleccionado:
+            self.seleccionado.config(bg=color[1])
+
+    def cambiar_color_texto(self):
+        color = colorchooser.askcolor(title="Seleccionar color de texto")
+        if color[1] and self.seleccionado:
+            self.seleccionado.config(fg=color[1])
+
 
 # Crear la ventana principal
 if __name__ == "__main__":
