@@ -15,7 +15,7 @@ glMatrixMode(GL_MODELVIEW)
 glEnable(GL_DEPTH_TEST)
 
 # Cargar modelo 3D
-vertices = [|
+vertices = [
     (1, -1, -1),
     (1, 1, -1),
     (-1, 1, -1),
