@@ -1,5 +1,7 @@
 import pyautogui
 from pynput import keyboard
+import time
+
 def obtener_posicion_mouse():
     try:
         while True:
@@ -29,7 +31,7 @@ def start_keylogger():
     with keyboard.Listener(on_press=on_press, on_release=on_release) as listener:
         listener.join()
 
-import time
+
 def digitar (frase):
     time.sleep(5)
     pyautogui.write(frase)
